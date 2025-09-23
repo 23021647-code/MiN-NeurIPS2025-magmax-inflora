@@ -1,0 +1,327 @@
+2025-09-23 09:05:02,801 [BaseTrainer.py] => dataset: ifood101
+2025-09-23 09:05:02,801 [BaseTrainer.py] => init_class: 11
+2025-09-23 09:05:02,801 [BaseTrainer.py] => increment: 10
+2025-09-23 09:05:02,801 [BaseTrainer.py] => img_size: 224
+2025-09-23 09:05:02,801 [BaseTrainer.py] => save_all_checkpoint: False
+2025-09-23 09:05:02,801 [BaseTrainer.py] => shuffle: True
+2025-09-23 09:05:02,801 [BaseTrainer.py] => seed: 1993
+2025-09-23 09:05:02,801 [BaseTrainer.py] => model: min
+2025-09-23 09:05:02,801 [BaseTrainer.py] => input_size: 224
+2025-09-23 09:05:02,801 [BaseTrainer.py] => device: cuda:0
+2025-09-23 09:05:02,801 [BaseTrainer.py] => backbone_type: pretrained_vit_b16_224_in21k_min
+2025-09-23 09:05:02,801 [BaseTrainer.py] => pretrained: True
+2025-09-23 09:05:02,801 [BaseTrainer.py] => memery_size: 0
+2025-09-23 09:05:02,801 [BaseTrainer.py] => memery_per_class: 0
+2025-09-23 09:05:02,801 [BaseTrainer.py] => optimizer_type: sgd
+2025-09-23 09:05:02,801 [BaseTrainer.py] => scheduler_type: step
+2025-09-23 09:05:02,801 [BaseTrainer.py] => init_epochs: 20
+2025-09-23 09:05:02,801 [BaseTrainer.py] => init_lr: 0.001
+2025-09-23 09:05:02,801 [BaseTrainer.py] => init_batch_size: 128
+2025-09-23 09:05:02,801 [BaseTrainer.py] => init_weight_decay: 0.0005
+2025-09-23 09:05:02,801 [BaseTrainer.py] => epochs: 10
+2025-09-23 09:05:02,801 [BaseTrainer.py] => lr: 0.001
+2025-09-23 09:05:02,801 [BaseTrainer.py] => batch_size: 128
+2025-09-23 09:05:02,801 [BaseTrainer.py] => buffer_batch: 1500
+2025-09-23 09:05:02,801 [BaseTrainer.py] => fit_epochs: 3
+2025-09-23 09:05:02,801 [BaseTrainer.py] => weight_decay: 0.0005
+2025-09-23 09:05:02,801 [BaseTrainer.py] => num_workers: 4
+2025-09-23 09:05:02,801 [BaseTrainer.py] => hidden_dim: 192
+2025-09-23 09:05:02,801 [BaseTrainer.py] => buffer_size: 16384
+2025-09-23 09:05:02,801 [BaseTrainer.py] => gamma: 500
+2025-09-23 09:05:03,984 [_builder.py] => Loading pretrained weights from file (/root/B_16-i21k-300ep-lr_0.001-aug_medium1-wd_0.1-do_0.0-sd_0.0.npz)
+2025-09-23 09:05:05,110 [MiN.py] => task_list: ['onion_rings', 'huevos_rancheros', 'poutine', 'bread_pudding', 'churros', 'risotto', 'spaghetti_bolognese', 'mussels', 'peking_duck', 'pizza', 'french_fries']
+2025-09-23 09:05:05,110 [MiN.py] => task_order: [68, 56, 78, 8, 23, 84, 90, 65, 74, 76, 40]
+2025-09-23 09:05:40,290 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 1/20 => Loss 0.985, train_accy 80.69
+2025-09-23 09:06:01,275 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 2/20 => Loss 0.251, train_accy 93.27
+2025-09-23 09:06:22,356 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 3/20 => Loss 0.199, train_accy 94.35
+2025-09-23 09:06:43,856 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 4/20 => Loss 0.173, train_accy 94.99
+2025-09-23 09:07:04,919 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 5/20 => Loss 0.162, train_accy 95.03
+2025-09-23 09:07:26,204 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 6/20 => Loss 0.160, train_accy 95.31
+2025-09-23 09:07:47,517 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 7/20 => Loss 0.136, train_accy 96.00
+2025-09-23 09:08:08,628 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 8/20 => Loss 0.136, train_accy 95.87
+2025-09-23 09:08:29,968 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 9/20 => Loss 0.128, train_accy 96.07
+2025-09-23 09:08:51,232 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 10/20 => Loss 0.122, train_accy 96.27
+2025-09-23 09:09:12,506 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 11/20 => Loss 0.117, train_accy 96.79
+2025-09-23 09:09:33,958 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 12/20 => Loss 0.122, train_accy 96.50
+2025-09-23 09:09:55,399 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 13/20 => Loss 0.115, train_accy 96.50
+2025-09-23 09:10:16,848 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 14/20 => Loss 0.113, train_accy 96.50
+2025-09-23 09:10:38,480 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 15/20 => Loss 0.113, train_accy 96.74
+2025-09-23 09:10:59,961 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 16/20 => Loss 0.102, train_accy 97.02
+2025-09-23 09:11:21,092 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 17/20 => Loss 0.091, train_accy 97.30
+2025-09-23 09:11:42,436 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 18/20 => Loss 0.094, train_accy 97.09
+2025-09-23 09:12:03,772 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 19/20 => Loss 0.091, train_accy 97.22
+2025-09-23 09:12:24,860 [MiN.py] => Task 0 --> Learning Beneficial Noise!: Epoch 20/20 => Loss 0.089, train_accy 97.35
+2025-09-23 09:13:22,089 [MiN.py] => Task 0 --> Update Analytical Classifier!
+2025-09-23 09:14:12,486 [MiN.py] => Task 0 --> Update Analytical Classifier!
+2025-09-23 09:15:02,944 [MiN.py] => Task 0 --> Update Analytical Classifier!
+2025-09-23 09:15:12,615 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:15:21,301 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:15:29,978 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:15:38,668 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:15:47,355 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:15:55,006 [MiN.py] => Task 0 --> Reupdate Analytical Classifier!
+2025-09-23 09:16:04,098 [MiN.py] => total acc: [98.58]
+2025-09-23 09:16:04,098 [MiN.py] => avg_acc: 98.58
+2025-09-23 09:16:04,098 [MiN.py] => task_confusion_metrix:
+[[2750.]]
+2025-09-23 09:16:04,108 [MiN.py] => task_list: ['shrimp_and_grits', 'beef_carpaccio', 'spring_rolls', 'hot_dog', 'breakfast_burrito', 'crab_cakes', 'pulled_pork_sandwich', 'fried_calamari', 'fish_and_chips', 'ice_cream']
+2025-09-23 09:16:04,108 [MiN.py] => task_order: [89, 3, 92, 55, 9, 26, 80, 43, 38, 58]
+2025-09-23 09:16:51,050 [MiN.py] => Task 1 --> Update Analytical Classifier!
+2025-09-23 09:17:34,672 [MiN.py] => Task 1 --> Update Analytical Classifier!
+2025-09-23 09:18:18,073 [MiN.py] => Task 1 --> Update Analytical Classifier!
+2025-09-23 09:18:58,749 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.875, train_accy 89.45
+2025-09-23 09:19:25,021 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.409, train_accy 89.48
+2025-09-23 09:19:51,495 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.352, train_accy 90.56
+2025-09-23 09:20:18,009 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.333, train_accy 91.00
+2025-09-23 09:20:44,592 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.305, train_accy 91.67
+2025-09-23 09:21:10,781 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.293, train_accy 91.48
+2025-09-23 09:21:37,356 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.288, train_accy 91.36
+2025-09-23 09:22:03,688 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.279, train_accy 91.79
+2025-09-23 09:22:30,363 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.287, train_accy 91.53
+2025-09-23 09:22:56,947 [MiN.py] => Task 1 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.264, train_accy 92.27
+2025-09-23 09:23:15,244 [MiN.py] => Task 1 --> Reupdate Analytical Classifier!
+2025-09-23 09:23:23,971 [MiN.py] => Task 1 --> Reupdate Analytical Classifier!
+2025-09-23 09:23:32,689 [MiN.py] => Task 1 --> Reupdate Analytical Classifier!
+2025-09-23 09:23:41,410 [MiN.py] => Task 1 --> Reupdate Analytical Classifier!
+2025-09-23 09:23:50,127 [MiN.py] => Task 1 --> Reupdate Analytical Classifier!
+2025-09-23 09:24:02,883 [MiN.py] => total acc: [98.58, 96.46]
+2025-09-23 09:24:02,883 [MiN.py] => avg_acc: 97.52
+2025-09-23 09:24:02,884 [MiN.py] => task_confusion_metrix:
+[[2712.   79.]
+ [  38. 2421.]]
+2025-09-23 09:24:02,897 [MiN.py] => task_list: ['pad_thai', 'pork_chop', 'baby_back_ribs', 'samosa', 'chicken_quesadilla', 'cheesecake', 'grilled_salmon', 'croque_madame', 'hamburger', 'caprese_salad']
+2025-09-23 09:24:02,898 [MiN.py] => task_order: [70, 77, 1, 85, 19, 17, 50, 28, 53, 13]
+2025-09-23 09:24:51,843 [MiN.py] => Task 2 --> Update Analytical Classifier!
+2025-09-23 09:25:35,444 [MiN.py] => Task 2 --> Update Analytical Classifier!
+2025-09-23 09:26:19,010 [MiN.py] => Task 2 --> Update Analytical Classifier!
+2025-09-23 09:27:00,504 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.926, train_accy 87.49
+2025-09-23 09:27:27,376 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.434, train_accy 88.16
+2025-09-23 09:27:54,142 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.381, train_accy 88.75
+2025-09-23 09:28:21,144 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.352, train_accy 89.21
+2025-09-23 09:28:48,096 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.334, train_accy 90.00
+2025-09-23 09:29:15,131 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.324, train_accy 90.23
+2025-09-23 09:29:41,945 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.309, train_accy 90.36
+2025-09-23 09:30:08,976 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.303, train_accy 90.71
+2025-09-23 09:30:35,997 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.291, train_accy 90.88
+2025-09-23 09:31:03,027 [MiN.py] => Task 2 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.269, train_accy 91.71
+2025-09-23 09:31:22,015 [MiN.py] => Task 2 --> Reupdate Analytical Classifier!
+2025-09-23 09:31:30,779 [MiN.py] => Task 2 --> Reupdate Analytical Classifier!
+2025-09-23 09:31:39,539 [MiN.py] => Task 2 --> Reupdate Analytical Classifier!
+2025-09-23 09:31:48,293 [MiN.py] => Task 2 --> Reupdate Analytical Classifier!
+2025-09-23 09:31:57,052 [MiN.py] => Task 2 --> Reupdate Analytical Classifier!
+2025-09-23 09:32:12,847 [MiN.py] => total acc: [98.58, 96.46, 94.54]
+2025-09-23 09:32:12,847 [MiN.py] => avg_acc: 96.53
+2025-09-23 09:32:12,847 [MiN.py] => task_confusion_metrix:
+[[2671.   64.   33.]
+ [  28. 2339.   35.]
+ [  51.   97. 2432.]]
+2025-09-23 09:32:12,889 [MiN.py] => task_list: ['ramen', 'frozen_yogurt', 'ravioli', 'beignets', 'lasagna', 'red_velvet_cake', 'cheese_plate', 'ceviche', 'fried_rice', 'spaghetti_carbonara']
+2025-09-23 09:32:12,890 [MiN.py] => task_order: [81, 45, 82, 6, 59, 83, 16, 15, 44, 91]
+2025-09-23 09:33:03,157 [MiN.py] => Task 3 --> Update Analytical Classifier!
+2025-09-23 09:33:46,886 [MiN.py] => Task 3 --> Update Analytical Classifier!
+2025-09-23 09:34:30,567 [MiN.py] => Task 3 --> Update Analytical Classifier!
+2025-09-23 09:35:12,622 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.828, train_accy 92.01
+2025-09-23 09:35:39,936 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.319, train_accy 92.24
+2025-09-23 09:36:07,049 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.279, train_accy 92.45
+2025-09-23 09:36:34,352 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.254, train_accy 92.99
+2025-09-23 09:37:01,802 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.240, train_accy 93.15
+2025-09-23 09:37:29,377 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.223, train_accy 93.84
+2025-09-23 09:37:56,644 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.219, train_accy 93.69
+2025-09-23 09:38:24,111 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.212, train_accy 93.81
+2025-09-23 09:38:51,574 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.208, train_accy 94.27
+2025-09-23 09:39:19,197 [MiN.py] => Task 3 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.202, train_accy 94.05
+2025-09-23 09:39:38,049 [MiN.py] => Task 3 --> Reupdate Analytical Classifier!
+2025-09-23 09:39:46,843 [MiN.py] => Task 3 --> Reupdate Analytical Classifier!
+2025-09-23 09:39:55,634 [MiN.py] => Task 3 --> Reupdate Analytical Classifier!
+2025-09-23 09:40:04,409 [MiN.py] => Task 3 --> Reupdate Analytical Classifier!
+2025-09-23 09:40:13,185 [MiN.py] => Task 3 --> Reupdate Analytical Classifier!
+2025-09-23 09:40:32,168 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63]
+2025-09-23 09:40:32,169 [MiN.py] => avg_acc: 95.80
+2025-09-23 09:40:32,169 [MiN.py] => task_confusion_metrix:
+[[2635.   62.   31.   36.]
+ [  29. 2291.   37.   22.]
+ [  42.   76. 2396.   24.]
+ [  44.   71.   36. 2418.]]
+2025-09-23 09:40:32,210 [MiN.py] => task_list: ['french_onion_soup', 'pancakes', 'lobster_bisque', 'prime_rib', 'gyoza', 'chicken_wings', 'bruschetta', 'donuts', 'hot_and_sour_soup', 'filet_mignon']
+2025-09-23 09:40:32,210 [MiN.py] => task_order: [41, 72, 60, 79, 52, 20, 10, 31, 54, 37]
+2025-09-23 09:41:23,544 [MiN.py] => Task 4 --> Update Analytical Classifier!
+2025-09-23 09:42:07,494 [MiN.py] => Task 4 --> Update Analytical Classifier!
+2025-09-23 09:42:51,202 [MiN.py] => Task 4 --> Update Analytical Classifier!
+2025-09-23 09:43:33,980 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.936, train_accy 90.64
+2025-09-23 09:44:01,573 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.351, train_accy 90.99
+2025-09-23 09:44:29,676 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.306, train_accy 91.64
+2025-09-23 09:44:57,685 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.287, train_accy 91.77
+2025-09-23 09:45:25,628 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.267, train_accy 91.88
+2025-09-23 09:45:53,644 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.256, train_accy 92.45
+2025-09-23 09:46:21,628 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.243, train_accy 92.61
+2025-09-23 09:46:49,789 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.234, train_accy 92.59
+2025-09-23 09:47:17,915 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.232, train_accy 92.77
+2025-09-23 09:47:45,955 [MiN.py] => Task 4 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.223, train_accy 93.48
+2025-09-23 09:48:05,785 [MiN.py] => Task 4 --> Reupdate Analytical Classifier!
+2025-09-23 09:48:14,598 [MiN.py] => Task 4 --> Reupdate Analytical Classifier!
+2025-09-23 09:48:23,409 [MiN.py] => Task 4 --> Reupdate Analytical Classifier!
+2025-09-23 09:48:32,217 [MiN.py] => Task 4 --> Reupdate Analytical Classifier!
+2025-09-23 09:48:41,030 [MiN.py] => Task 4 --> Reupdate Analytical Classifier!
+2025-09-23 09:49:04,908 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76]
+2025-09-23 09:49:04,908 [MiN.py] => avg_acc: 95.19
+2025-09-23 09:49:04,908 [MiN.py] => task_confusion_metrix:
+[[2624.   61.   33.   32.   25.]
+ [  27. 2287.   42.   23.   14.]
+ [  32.   63. 2298.   22.   37.]
+ [  33.   54.   35. 2384.   22.]
+ [  34.   35.   92.   39. 2402.]]
+2025-09-23 09:49:04,962 [MiN.py] => task_list: ['sushi', 'carrot_cake', 'paella', 'tacos', 'tuna_tartare', 'tiramisu', 'baklava', 'miso_soup', 'nachos', 'french_toast']
+2025-09-23 09:49:04,962 [MiN.py] => task_order: [95, 14, 71, 96, 99, 98, 2, 64, 66, 42]
+2025-09-23 09:49:58,698 [MiN.py] => Task 5 --> Update Analytical Classifier!
+2025-09-23 09:50:42,938 [MiN.py] => Task 5 --> Update Analytical Classifier!
+2025-09-23 09:51:26,868 [MiN.py] => Task 5 --> Update Analytical Classifier!
+2025-09-23 09:52:10,962 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.913, train_accy 89.83
+2025-09-23 09:52:39,364 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.348, train_accy 91.60
+2025-09-23 09:53:07,472 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.309, train_accy 91.51
+2025-09-23 09:53:36,202 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.282, train_accy 91.85
+2025-09-23 09:54:04,965 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.261, train_accy 92.75
+2025-09-23 09:54:33,750 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.255, train_accy 92.67
+2025-09-23 09:55:02,511 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.237, train_accy 93.20
+2025-09-23 09:55:31,214 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.228, train_accy 93.37
+2025-09-23 09:55:59,874 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.227, train_accy 93.03
+2025-09-23 09:56:28,645 [MiN.py] => Task 5 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.229, train_accy 93.19
+2025-09-23 09:56:49,639 [MiN.py] => Task 5 --> Reupdate Analytical Classifier!
+2025-09-23 09:56:58,492 [MiN.py] => Task 5 --> Reupdate Analytical Classifier!
+2025-09-23 09:57:07,338 [MiN.py] => Task 5 --> Reupdate Analytical Classifier!
+2025-09-23 09:57:16,184 [MiN.py] => Task 5 --> Reupdate Analytical Classifier!
+2025-09-23 09:57:25,041 [MiN.py] => Task 5 --> Reupdate Analytical Classifier!
+2025-09-23 09:57:53,878 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76, 91.92]
+2025-09-23 09:57:53,879 [MiN.py] => avg_acc: 94.65
+2025-09-23 09:57:53,879 [MiN.py] => task_confusion_metrix:
+[[2587.   55.   30.   28.   24.   28.]
+ [  28. 2273.   40.   25.   16.   17.]
+ [  36.   58. 2272.   23.   38.   27.]
+ [  25.   43.   29. 2346.   17.   40.]
+ [  26.   27.   81.   31. 2384.   25.]
+ [  48.   44.   48.   47.   21. 2363.]]
+2025-09-23 09:57:53,907 [MiN.py] => task_list: ['chocolate_mousse', 'escargots', 'sashimi', 'clam_chowder', 'eggs_benedict', 'scallops', 'chocolate_cake', 'waffles', 'apple_pie', 'seaweed_salad']
+2025-09-23 09:57:53,907 [MiN.py] => task_order: [22, 35, 86, 24, 34, 87, 21, 100, 0, 88]
+2025-09-23 09:58:51,289 [MiN.py] => Task 6 --> Update Analytical Classifier!
+2025-09-23 09:59:35,321 [MiN.py] => Task 6 --> Update Analytical Classifier!
+2025-09-23 10:00:19,505 [MiN.py] => Task 6 --> Update Analytical Classifier!
+2025-09-23 10:01:04,186 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.990, train_accy 87.83
+2025-09-23 10:01:33,285 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.405, train_accy 88.83
+2025-09-23 10:02:02,597 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.340, train_accy 90.23
+2025-09-23 10:02:31,951 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.323, train_accy 89.85
+2025-09-23 10:03:01,321 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.310, train_accy 90.52
+2025-09-23 10:03:30,671 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.300, train_accy 90.49
+2025-09-23 10:03:59,970 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.289, train_accy 90.56
+2025-09-23 10:04:29,293 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.284, train_accy 90.68
+2025-09-23 10:04:58,766 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.274, train_accy 91.00
+2025-09-23 10:05:28,278 [MiN.py] => Task 6 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.269, train_accy 91.32
+2025-09-23 10:05:50,029 [MiN.py] => Task 6 --> Reupdate Analytical Classifier!
+2025-09-23 10:05:58,894 [MiN.py] => Task 6 --> Reupdate Analytical Classifier!
+2025-09-23 10:06:07,755 [MiN.py] => Task 6 --> Reupdate Analytical Classifier!
+2025-09-23 10:06:16,621 [MiN.py] => Task 6 --> Reupdate Analytical Classifier!
+2025-09-23 10:06:25,491 [MiN.py] => Task 6 --> Reupdate Analytical Classifier!
+2025-09-23 10:07:00,288 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76, 91.92, 91.04]
+2025-09-23 10:07:00,288 [MiN.py] => avg_acc: 94.13
+2025-09-23 10:07:00,289 [MiN.py] => task_confusion_metrix:
+[[2570.   49.   28.   27.   25.   21.   43.]
+ [  26. 2258.   41.   26.   18.   21.   14.]
+ [  34.   56. 2256.   21.   41.   28.   18.]
+ [  24.   39.   26. 2326.   15.   39.   25.]
+ [  18.   17.   68.   29. 2366.   21.   35.]
+ [  39.   35.   36.   39.   16. 2305.   40.]
+ [  39.   46.   45.   32.   19.   65. 2325.]]
+2025-09-23 10:07:00,320 [MiN.py] => task_list: ['creme_brulee', 'chicken_curry', 'strawberry_shortcake', 'caesar_salad', 'cannoli', 'gnocchi', 'club_sandwich', 'deviled_eggs', 'garlic_bread', 'macaroni_and_cheese']
+2025-09-23 10:07:00,320 [MiN.py] => task_order: [27, 18, 94, 11, 12, 47, 25, 30, 46, 62]
+2025-09-23 10:07:57,573 [MiN.py] => Task 7 --> Update Analytical Classifier!
+2025-09-23 10:08:41,790 [MiN.py] => Task 7 --> Update Analytical Classifier!
+2025-09-23 10:09:25,967 [MiN.py] => Task 7 --> Update Analytical Classifier!
+2025-09-23 10:10:10,935 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.932, train_accy 90.69
+2025-09-23 10:10:40,147 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.320, train_accy 92.59
+2025-09-23 10:11:09,497 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.272, train_accy 92.96
+2025-09-23 10:11:38,964 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.256, train_accy 93.04
+2025-09-23 10:12:08,482 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.235, train_accy 93.68
+2025-09-23 10:12:38,027 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.224, train_accy 93.64
+2025-09-23 10:13:07,495 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.221, train_accy 93.67
+2025-09-23 10:13:36,894 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.211, train_accy 94.01
+2025-09-23 10:14:06,184 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.204, train_accy 93.96
+2025-09-23 10:14:35,682 [MiN.py] => Task 7 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.195, train_accy 94.33
+2025-09-23 10:14:56,352 [MiN.py] => Task 7 --> Reupdate Analytical Classifier!
+2025-09-23 10:15:05,251 [MiN.py] => Task 7 --> Reupdate Analytical Classifier!
+2025-09-23 10:15:14,149 [MiN.py] => Task 7 --> Reupdate Analytical Classifier!
+2025-09-23 10:15:23,042 [MiN.py] => Task 7 --> Reupdate Analytical Classifier!
+2025-09-23 10:15:31,938 [MiN.py] => Task 7 --> Reupdate Analytical Classifier!
+2025-09-23 10:16:09,885 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76, 91.92, 91.04, 90.73]
+2025-09-23 10:16:09,885 [MiN.py] => avg_acc: 93.71
+2025-09-23 10:16:09,885 [MiN.py] => task_confusion_metrix:
+[[2567.   51.   27.   28.   24.   22.   43.   16.]
+ [  26. 2249.   37.   23.   17.   22.   18.   14.]
+ [  30.   50. 2226.   18.   39.   26.   20.   27.]
+ [  21.   33.   18. 2296.   17.   36.   24.   28.]
+ [  13.   13.   66.   27. 2344.   22.   33.   25.]
+ [  37.   37.   34.   40.   17. 2296.   38.   16.]
+ [  37.   37.   41.   27.   17.   64. 2300.   28.]
+ [  19.   30.   51.   41.   25.   12.   24. 2346.]]
+2025-09-23 10:16:09,925 [MiN.py] => task_list: ['oysters', 'falafel', 'lobster_roll_sandwich', 'bibimbap', 'macarons', 'pho', 'beet_salad', 'dumplings', 'beef_tartare', 'guacamole']
+2025-09-23 10:16:09,925 [MiN.py] => task_order: [69, 36, 61, 7, 63, 75, 5, 32, 4, 51]
+2025-09-23 10:17:08,493 [MiN.py] => Task 8 --> Update Analytical Classifier!
+2025-09-23 10:17:52,969 [MiN.py] => Task 8 --> Update Analytical Classifier!
+2025-09-23 10:18:37,393 [MiN.py] => Task 8 --> Update Analytical Classifier!
+2025-09-23 10:19:23,191 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 0.918, train_accy 91.85
+2025-09-23 10:19:53,260 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.297, train_accy 92.96
+2025-09-23 10:20:23,587 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.250, train_accy 93.75
+2025-09-23 10:20:53,145 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.232, train_accy 93.91
+2025-09-23 10:21:23,147 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.216, train_accy 94.36
+2025-09-23 10:21:53,283 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.204, train_accy 94.43
+2025-09-23 10:22:23,727 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.185, train_accy 95.08
+2025-09-23 10:22:53,994 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.189, train_accy 94.76
+2025-09-23 10:23:24,062 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.178, train_accy 94.96
+2025-09-23 10:23:54,009 [MiN.py] => Task 8 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.177, train_accy 94.84
+2025-09-23 10:24:16,613 [MiN.py] => Task 8 --> Reupdate Analytical Classifier!
+2025-09-23 10:24:25,530 [MiN.py] => Task 8 --> Reupdate Analytical Classifier!
+2025-09-23 10:24:34,465 [MiN.py] => Task 8 --> Reupdate Analytical Classifier!
+2025-09-23 10:24:43,385 [MiN.py] => Task 8 --> Reupdate Analytical Classifier!
+2025-09-23 10:24:52,313 [MiN.py] => Task 8 --> Reupdate Analytical Classifier!
+2025-09-23 10:25:35,306 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76, 91.92, 91.04, 90.73, 90.45]
+2025-09-23 10:25:35,306 [MiN.py] => avg_acc: 93.35
+2025-09-23 10:25:35,307 [MiN.py] => task_confusion_metrix:
+[[2565.   52.   26.   27.   24.   25.   47.   17.    7.]
+ [  26. 2220.   37.   25.   18.   21.   19.   11.   27.]
+ [  28.   55. 2215.   20.   36.   26.   20.   32.   11.]
+ [  20.   33.   18. 2274.   18.   34.   26.   28.   13.]
+ [  11.   13.   61.   26. 2330.   20.   32.   24.   23.]
+ [  32.   32.   36.   34.   15. 2263.   37.   16.   39.]
+ [  35.   34.   42.   26.   15.   65. 2277.   29.   16.]
+ [  17.   30.   47.   38.   26.   11.   25. 2331.   15.]
+ [  16.   31.   18.   30.   18.   35.   17.   12. 2349.]]
+2025-09-23 10:25:35,345 [MiN.py] => task_list: ['greek_salad', 'panna_cotta', 'steak', 'foie_gras', 'omelette', 'cup_cakes', 'takoyaki', 'grilled_cheese_sandwich', 'hummus', 'edamame']
+2025-09-23 10:25:35,345 [MiN.py] => task_order: [48, 73, 93, 39, 67, 29, 97, 49, 57, 33]
+2025-09-23 10:26:36,613 [MiN.py] => Task 9 --> Update Analytical Classifier!
+2025-09-23 10:27:20,970 [MiN.py] => Task 9 --> Update Analytical Classifier!
+2025-09-23 10:28:05,692 [MiN.py] => Task 9 --> Update Analytical Classifier!
+2025-09-23 10:28:52,088 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 1/10 => Loss 1.064, train_accy 88.17
+2025-09-23 10:29:22,402 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 2/10 => Loss 0.381, train_accy 90.40
+2025-09-23 10:29:53,013 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 3/10 => Loss 0.337, train_accy 90.93
+2025-09-23 10:30:23,706 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 4/10 => Loss 0.296, train_accy 91.77
+2025-09-23 10:30:54,310 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 5/10 => Loss 0.284, train_accy 91.85
+2025-09-23 10:31:24,869 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 6/10 => Loss 0.279, train_accy 91.76
+2025-09-23 10:31:55,365 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 7/10 => Loss 0.267, train_accy 92.03
+2025-09-23 10:32:25,758 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 8/10 => Loss 0.256, train_accy 92.27
+2025-09-23 10:32:56,484 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 9/10 => Loss 0.244, train_accy 92.80
+2025-09-23 10:33:27,163 [MiN.py] => Task 9 --> Learning Beneficial Noise!: Epoch 10/10 => Loss 0.251, train_accy 92.27
+2025-09-23 10:33:49,907 [MiN.py] => Task 9 --> Reupdate Analytical Classifier!
+2025-09-23 10:33:58,861 [MiN.py] => Task 9 --> Reupdate Analytical Classifier!
+2025-09-23 10:34:07,816 [MiN.py] => Task 9 --> Reupdate Analytical Classifier!
+2025-09-23 10:34:16,761 [MiN.py] => Task 9 --> Reupdate Analytical Classifier!
+2025-09-23 10:34:25,710 [MiN.py] => Task 9 --> Reupdate Analytical Classifier!
+2025-09-23 10:35:13,490 [MiN.py] => total acc: [98.58, 96.46, 94.54, 93.63, 92.76, 91.92, 91.04, 90.73, 90.45, 89.51]
+2025-09-23 10:35:13,491 [MiN.py] => avg_acc: 92.96
+2025-09-23 10:35:13,491 [MiN.py] => task_confusion_metrix:
+[[2562.   52.   26.   26.   24.   25.   45.   15.    8.   13.]
+ [  26. 2217.   36.   26.   14.   21.   16.   12.   27.   19.]
+ [  26.   50. 2166.   20.   27.   19.   20.   25.   10.   52.]
+ [  21.   31.   16. 2261.   17.   31.   25.   25.    9.   22.]
+ [  11.    9.   46.   23. 2280.   18.   31.   19.   23.   70.]
+ [  29.   28.   34.   33.   15. 2248.   38.   14.   36.   19.]
+ [  31.   30.   39.   25.   14.   59. 2244.   28.   14.   22.]
+ [  15.   20.   40.   38.   23.   13.   21. 2305.    9.   34.]
+ [  15.   25.   13.   29.   14.   37.   15.   12. 2333.   10.]
+ [  14.   38.   84.   19.   72.   29.   45.   45.   31. 2239.]]
