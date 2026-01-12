@@ -13,7 +13,8 @@ from torch.nn import functional as F
 import scipy.stats as stats
 import timm
 import random
-
+# [ADDED] Import autocast để kiểm soát precision thủ công
+from torch.cuda.amp import autocast 
 
 class BaseIncNet(nn.Module):
     def __init__(self, args: dict):
@@ -55,8 +56,10 @@ class RandomBuffer(torch.nn.Linear):
         self.bias = None
         self.in_features = in_features
         self.out_features = buffer_size
-        factory_kwargs = {"device": device, "dtype": torch.double}
-        # self.W = torch.empty((self.out_features, self.in_features), **factory_kwargs)
+        
+        # [MODIFIED] Dùng float32 thay vì double (tiết kiệm 50% VRAM)
+        factory_kwargs = {"device": device, "dtype": torch.float32}
+        
         self.W = torch.empty((self.in_features, self.out_features), **factory_kwargs)
         self.register_buffer("weight", self.W)
 
@@ -64,7 +67,8 @@ class RandomBuffer(torch.nn.Linear):
 
     # @torch.no_grad()
     def forward(self, X: torch.Tensor) -> torch.Tensor:
-        X = X.to(self.weight)
+        # [ADDED] Đảm bảo input cùng kiểu với weight (tránh lỗi FP16 vs FP32)
+        X = X.to(self.weight.dtype)
         return F.relu(X @ self.W)
 
 
@@ -82,7 +86,8 @@ class MiNbaseNet(nn.Module):
 
         self.buffer = RandomBuffer(in_features=self.feature_dim, buffer_size=self.buffer_size, device=self.device)
 
-        factory_kwargs = {"device": self.device, "dtype": torch.double}
+        # [MODIFIED] Chuyển toàn bộ sang float32
+        factory_kwargs = {"device": self.device, "dtype": torch.float32}
 
         weight = torch.zeros((self.buffer_size, 0), **factory_kwargs)
         self.register_buffer("weight", weight)
@@ -98,6 +103,15 @@ class MiNbaseNet(nn.Module):
         self.known_class = 0
 
         self.fc2 = nn.ModuleList()
+
+    # [ADDED] Hỗ trợ Gradient Checkpointing (Cứu cánh cho OOM)
+    def set_grad_checkpointing(self, enable=True):
+        if hasattr(self.backbone, 'set_grad_checkpointing'):
+            self.backbone.set_grad_checkpointing(enable)
+        elif hasattr(self.backbone, 'model') and hasattr(self.backbone.model, 'set_grad_checkpointing'):
+             self.backbone.model.set_grad_checkpointing(enable)
+        elif hasattr(self.backbone, 'grad_checkpointing'):
+            self.backbone.grad_checkpointing = enable
 
     def forward_fc(self, features):
         features = features.to(self.weight)
@@ -128,24 +142,32 @@ class MiNbaseNet(nn.Module):
 
     @torch.no_grad()
     def fit(self, X: torch.Tensor, Y: torch.Tensor) -> None:
+        # [MODIFIED] Tắt Autocast ở đây. Ma trận nghịch đảo cần chạy FP32.
+        with autocast(enabled=False):
+            X = self.backbone(X).float() # Ép về float32
+            X = self.buffer(X) # Buffer đã sửa thành float32 ở trên
 
-        X = self.buffer(self.backbone(X))
+            X, Y = X.to(self.weight.device), Y.to(self.weight.device).float()
 
-        X, Y = X.to(self.weight), Y.to(self.weight)
+            num_targets = Y.shape[1]
+            if num_targets > self.out_features:
+                increment_size = num_targets - self.out_features
+                tail = torch.zeros((self.weight.shape[0], increment_size)).to(self.weight)
+                self.weight = torch.cat((self.weight, tail), dim=1)
+            elif num_targets < self.out_features:
+                increment_size = self.out_features - num_targets
+                tail = torch.zeros((Y.shape[0], increment_size)).to(Y)
+                Y = torch.cat((Y, tail), dim=1)
 
-        num_targets = Y.shape[1]
-        if num_targets > self.out_features:
-            increment_size = num_targets - self.out_features
-            tail = torch.zeros((self.weight.shape[0], increment_size)).to(self.weight)
-            self.weight = torch.cat((self.weight, tail), dim=1)
-        elif num_targets < self.out_features:
-            increment_size = self.out_features - num_targets
-            tail = torch.zeros((Y.shape[0], increment_size)).to(Y)
-            Y = torch.cat((Y, tail), dim=1)
-
-        K = torch.inverse(torch.eye(X.shape[0]).to(X) + X @ self.R @ X.T)
-        self.R -= self.R @ X.T @ K @ X @ self.R
-        self.weight += self.R @ X.T @ (Y - X @ self.weight)
+            # [MODIFIED] Thêm Jitter để tránh Singular Matrix (vì dùng float32 kém chính xác hơn double)
+            I = torch.eye(X.shape[0]).to(X)
+            term = I + X @ self.R @ X.T
+            jitter = 1e-6 * torch.eye(term.shape[0], device=term.device)
+            
+            K = torch.inverse(term + jitter)
+            
+            self.R -= self.R @ X.T @ K @ X @ self.R
+            self.weight += self.R @ X.T @ (Y - X @ self.weight)
 
     def forward(self, x, new_forward: bool = False):
 
@@ -153,16 +175,27 @@ class MiNbaseNet(nn.Module):
             hyper_features = self.backbone(x, new_forward=True)
         else:
             hyper_features = self.backbone(x)
+        
+        # [ADDED] Cast về dtype của weight (thường là FP16 nếu đang autocast)
+        hyper_features = hyper_features.to(self.weight.dtype)
         logits = self.forward_fc(self.buffer(hyper_features))
         return {
             'logits': logits
         }
     
     def update_task_prototype(self, prototype):
-        self.task_prototypes[-1] = prototype
+        # [MODIFIED] Lưu về CPU
+        if isinstance(prototype, torch.Tensor):
+            self.task_prototypes[-1] = prototype.detach().cpu()
+        else:
+            self.task_prototypes[-1] = prototype # Giả sử đã xử lý ở min.py
 
     def extend_task_prototype(self, prototype):
-        self.task_prototypes.append(prototype)
+        # [MODIFIED] Lưu về CPU
+        if isinstance(prototype, torch.Tensor):
+            self.task_prototypes.append(prototype.detach().cpu())
+        else:
+            self.task_prototypes.append(prototype)
 
     def extract_feature(self, x):
         hyper_features = self.backbone(x)
@@ -174,8 +207,11 @@ class MiNbaseNet(nn.Module):
             hyper_features = self.backbone(x, new_forward=True)
         else:
             hyper_features = self.backbone(x)
+        
+        # [MODIFIED] Logic ép kiểu an toàn
         hyper_features = self.buffer(hyper_features)
-        hyper_features = hyper_features.to(torch.float32)
+        hyper_features = hyper_features.to(self.normal_fc.weight.dtype) 
+        
         logits = self.normal_fc(hyper_features)['logits']
         return {
             "logits": logits
