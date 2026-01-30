@@ -135,6 +135,7 @@ class MinNet(object):
         self._clear_gpu()
         
         self.run(train_loader)
+        self._network.collect_projections()
         self._network.after_task_magmax_merge()
         #self.analyze_model_sparsity()
         
