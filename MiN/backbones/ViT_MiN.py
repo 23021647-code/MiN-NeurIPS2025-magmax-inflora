@@ -494,14 +494,14 @@ class PiNoise(nn.Module):
         torch.nn.init.constant_(self.MLP.weight, 0)
         torch.nn.init.constant_(self.MLP.bias, 0)
 
-        # Buffer: An toÃ n cho Optimizer
+        # Buffer: An toàn cho Optimizer
         self.w_down = nn.Parameter(torch.empty((in_dim, hidden_dim)))
         nn.init.xavier_uniform_(self.w_down) 
         self.w_up = nn.Parameter(torch.empty((hidden_dim, out_dim)))
         nn.init.xavier_uniform_(self.w_up)
 
         self.hidden_dim = hidden_dim
-        # Bá» GELU Ä‘á»ƒ tiáº¿t kiá»‡m tÃ­nh toÃ¡n náº¿u muá»‘n, hoáº·c giá»¯ cÅ©ng Ä‘Æ°á»£c
+        # Bỏ GELU để tiết kiệm tính toán nếu muốn, hoặc giữ cũng được
         self.act = nn.GELU() 
 
         # --- Trainable Parts ---
@@ -551,12 +551,12 @@ class PiNoise(nn.Module):
         x1 = self.MLP(hyper_features)
         x_down = hyper_features @ self.w_down
         
-        # [FIX OOM 1: GIáº¢M Sá» LÆ¯á»¢NG CACHE XUá»NG Cá»°C THáº¤P]
-        # 20 Batch x 12 Layers â‰ˆ 2.4 GB RAM -> An toÃ n cho Kaggle
-        # Vá»›i dim=192, 20 batch lÃ  thá»«a Ä‘á»§ thá»‘ng kÃª.
+        # [FIX OOM 1: GIẢM SỐ LƯỢNG CACHE XUỐNG CỰC THẤP]
+        # 20 Batch x 12 Layers ≈ 2.4 GB RAM -> An toàn cho Kaggle
+        # Với dim=192, 20 batch là thừa đủ thống kê.
         if self.training:
             if len(self.feature_cache) < 20: 
-                # LÆ°u CPU float32
+                # Lưu CPU float32
                 self.feature_cache.append(x_down.detach().cpu().float())
         
         noise = self.mu(x_down) + self.sigma(x_down)
@@ -577,56 +577,56 @@ class PiNoise(nn.Module):
 
     def compute_projection_matrix(self, threshold=0.93): 
         """
-        PhiÃªn báº£n No-Limit nhÆ°ng Tiáº¿t kiá»‡m RAM tá»‘i Ä‘a.
+        Phiên bản No-Limit nhưng Tiết kiệm RAM tối đa.
         """
         if not self.feature_cache: return
         
-        # [FIX OOM 2: TÃ­nh toÃ¡n trÃªn CPU náº¿u sá»£ VRAM OOM]
-        # Vá»›i ma tráº­n 192x192, CPU tÃ­nh cÅ©ng nhanh, khÃ´ng cáº§n Ã©p lÃªn GPU
-        # Äá»ƒ device='cpu' Ä‘á»ƒ an toÃ n tuyá»‡t Ä‘á»‘i cho VRAM
+        # [FIX OOM 2: Tính toán trên CPU nếu sợ VRAM OOM]
+        # Với ma trận 192x192, CPU tính cũng nhanh, không cần ép lên GPU
+        # Để device='cpu' để an toàn tuyệt đối cho VRAM
         device = 'cpu' 
         
         correlation_matrix = torch.zeros(self.hidden_dim, self.hidden_dim).to(device)
         
         for batch in self.feature_cache:
-            # batch Ä‘ang á»Ÿ CPU
+            # batch đang ở CPU
             b = batch.to(device) 
             if b.dim() > 2:
                 b = b.reshape(-1, b.shape[-1])
             correlation_matrix += b.t() @ b
             del b
         
-        # XÃ³a cache RAM
+        # Xóa cache RAM
         self.feature_cache = [] 
         import gc; gc.collect()
 
-        # TÃ­nh SVD (trÃªn CPU hoáº·c GPU tÃ¹y device Ä‘Ã£ chá»n á»Ÿ trÃªn)
-        # Náº¿u correlation_matrix á»Ÿ CPU, svd cÅ©ng cháº¡y CPU -> KhÃ´ng tá»‘n 1 giá»t VRAM
+        # Tính SVD (trên CPU hoặc GPU tùy device đã chọn ở trên)
+        # Nếu correlation_matrix ở CPU, svd cũng chạy CPU -> Không tốn 1 giọt VRAM
         try:
             U_new, S_new, _ = torch.linalg.svd(correlation_matrix)
         except:
-             # Fallback náº¿u linalg lá»—i
+             # Fallback nếu linalg lỗi
             U_new, S_new, _ = torch.svd(correlation_matrix)
         
-        # --- Logic chá»n K ---
+        # --- Logic chọn K ---
         total_var = torch.sum(S_new)
         s_cumsum = torch.cumsum(S_new, dim=0)
         k_threshold = torch.searchsorted(s_cumsum, total_var * threshold).item()
         
         k_final = k_threshold
-        print(f"--> GPM: Task chiáº¿m {k_final+1}/{self.hidden_dim} chiá»u (Thres {threshold})")
+        print(f"--> GPM: Task chiếm {k_final+1}/{self.hidden_dim} chiều (Thres {threshold})")
 
-        # ÄÆ°a U_task vá» Ä‘Ãºng device cá»§a model Ä‘á»ƒ lÆ°u
+        # Đưa U_task về đúng device của model để lưu
         U_task = U_new[:, :k_final+1].to(self.memory_U.device)
 
         if self.memory_U.shape[1] == 0:
             self.memory_U = U_task
         else:
             combined_U = torch.cat([self.memory_U, U_task], dim=1)
-            # SVD update láº¡i memory
+            # SVD update lại memory
             U_final, _, _ = torch.linalg.svd(combined_U, full_matrices=False)
             
-            # Giá»¯ rank khÃ´ng vÆ°á»£t quÃ¡ hidden_dim
+            # Giữ rank không vượt quá hidden_dim
             final_k = min(U_final.shape[1], self.hidden_dim) 
             self.memory_U = U_final[:, :final_k]
 
@@ -646,7 +646,7 @@ class PiNoise(nn.Module):
     def unfreeze_incremental(self):
         for param in self.mu.parameters(): param.requires_grad = True
         for param in self.sigma.parameters(): param.requires_grad = True
-        # self.MLP.requires_grad_(True) # GIá»® COMMENT DÃ’NG NÃ€Y
+        # self.MLP.requires_grad_(True) # GIỮ COMMENT DÒNG NÀY
         self.w_down.requires_grad = False
         self.w_up.requires_grad = False
 
