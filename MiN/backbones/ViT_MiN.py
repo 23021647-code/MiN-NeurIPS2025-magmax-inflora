@@ -68,13 +68,16 @@ import torch
 import torch.nn as nn
 import gc
 import math
+import torch
+import torch.nn as nn
+import gc
+import math
 
 class PiNoise(nn.Module):
     def __init__(self, in_dim, out_dim, hidden_dim=192):
         super(PiNoise, self).__init__()
         
-        # --- Shared Fixed Parts (LoRA-style) ---
-        # w_down/up: Đóng băng để giữ khung kiến thức chung
+        # --- Shared Fixed Parts ---
         self.w_down = nn.Parameter(torch.empty(in_dim, hidden_dim))
         nn.init.xavier_uniform_(self.w_down)
         
@@ -83,14 +86,13 @@ class PiNoise(nn.Module):
         
         self.hidden_dim = hidden_dim
         
-        # --- Trainable Parts (Specific Task Adaptation) ---
+        # --- Trainable Parts ---
         self.mu = nn.Linear(hidden_dim, hidden_dim)
         self.sigma = nn.Linear(hidden_dim, hidden_dim)
         self._init_zero(self.mu)
         self._init_zero(self.sigma)
         
         # --- GPM Buffers ---
-        # Lưu U_core: Basis của không gian đặc trưng quan trọng [Hidden, Rank]
         self.register_buffer('core_U', torch.zeros(hidden_dim, 0))  
         self.feature_cache = [] 
 
@@ -99,41 +101,31 @@ class PiNoise(nn.Module):
         torch.nn.init.constant_(module.bias, 0.)
 
     def update_noise(self):
-        """Unfreeze trainable parts for new task"""
         for param in self.mu.parameters(): param.requires_grad = True
         for param in self.sigma.parameters(): param.requires_grad = True
 
     def unfreeze_task_0(self):
-        """Task 0: Train everything"""
         for param in self.parameters(): param.requires_grad = True
         self.w_down.requires_grad = False
         self.w_up.requires_grad = False
 
     def unfreeze_incremental(self):
-        """Task > 0: Train noise only"""
         self.update_noise()
         self.w_down.requires_grad = False
         self.w_up.requires_grad = False
 
     def forward(self, hyper_features, new_forward=False):
-        # 1. Down Projection
         x_down = hyper_features @ self.w_down 
         
-        # 2. Caching for GPM (Chỉ lấy mẫu đại diện để tránh OOM)
+        # Caching mẫu đại diện
         if self.training:
             if len(self.feature_cache) < 50: 
                 self.feature_cache.append(x_down.detach().cpu().float())
         
-        # 3. Generate Noise
         noise = self.mu(x_down) + self.sigma(x_down)
-        
-        # 4. Add Noise & Up Projection
         return hyper_features + (noise @ self.w_up)
 
     def apply_gradient_projection(self, scale=1.0):
-        """
-        GPM Scaled (SGP): g_new = g - scale * (g @ U) @ U.T
-        """
         if self.core_U.shape[1] == 0: return
         
         with torch.no_grad():
@@ -142,7 +134,6 @@ class PiNoise(nn.Module):
                 if weight.grad is not None:
                     g_inner = weight.grad @ U 
                     g_proj = g_inner @ U.t()
-                    # Nhân với scale: scale < 1.0 cho phép cập nhật nhẹ vào không gian cũ
                     weight.grad -= (g_proj * scale)
 
             project_grad(self.mu.weight)
@@ -150,11 +141,11 @@ class PiNoise(nn.Module):
 
     def compute_projection_matrix(self, mode='threshold', val=0.9):
         """
-        Tính SVD, Cập nhật Core Memory VÀ Kiểm tra độ trực giao.
+        Tính SVD và Cập nhật Core Memory.
         """
         if not self.feature_cache: return
         
-        device = 'cpu' # Tiết kiệm VRAM tối đa
+        device = 'cpu' 
         correlation_matrix = torch.zeros(self.hidden_dim, self.hidden_dim).to(device)
         
         for batch in self.feature_cache:
@@ -172,54 +163,34 @@ class PiNoise(nn.Module):
         except:
             U, S, _ = torch.svd(correlation_matrix)
         
-        # 3. Chọn K theo Threshold
+        # 3. Chọn K theo Threshold (Bỏ limit_k)
         if mode == 'threshold':
             total_var = torch.sum(S)
             s_cumsum = torch.cumsum(S, dim=0)
             k = torch.searchsorted(s_cumsum, total_var * val).item()
             print(f"--> GPM Selection (Energy {val}): Need {k} dims.")
-        elif mode == 'eigenvalue':
-            max_s = S[0]
-            if max_s == 0: k = 0
-            else: k = (S / max_s > val).sum().item()
-            print(f"--> GPM Selection (Eigenvalue {val}): Need {k} dims.")
         else:
             k = int(val)
 
-        # 4. SAFETY MARGIN & LIMIT
-        # Margin an toàn bắt buộc
+        # 4. Safety Margin
         MARGIN = 12 
         MAX_ALLOWED_RANK = self.hidden_dim - MARGIN
         k = min(k, MAX_ALLOWED_RANK)
         
-        # Lấy Basis mới
         U_new = U[:, :k+1].to(self.core_U.device)
 
         # =================================================================
-        # [NEW] KIỂM TRA ĐỘ TRỰC GIAO (ORTHOGONALITY CHECK)
+        # KIỂM TRA ĐỘ TRỰC GIAO (ORTHOGONALITY CHECK)
         # =================================================================
         if self.core_U.shape[1] > 0:
             with torch.no_grad():
-                # Chiếu không gian mới lên không gian cũ: P = U_old.T * U_new
                 projection = self.core_U.t() @ U_new
-                
-                # Tính độ lớn phần chồng lấn (Frobenius Norm)
                 overlap_score = torch.norm(projection, p='fro').item()
-                
-                # Chuẩn hóa về [0, 1] để dễ nhìn
-                # Max overlap lý thuyết = sqrt(min(rank_old, rank_new))
                 max_overlap = math.sqrt(min(self.core_U.shape[1], U_new.shape[1])) + 1e-8
                 norm_overlap = overlap_score / max_overlap
-                
-                print(f"--> [ORTHOGONALITY] Overlap Score: {overlap_score:.4f} (Norm: {norm_overlap:.4f})")
-                
-                if norm_overlap < 0.2:
-                    print("    => Tốt: Task mới khá khác biệt (Trực giao cao).")
-                elif norm_overlap > 0.6:
-                    print("    => Cảnh báo: Task mới trùng lặp nhiều với Task cũ.")
-        # =================================================================
+                print(f"--> [ORTHOGONALITY] Overlap: {overlap_score:.4f} (Norm: {norm_overlap:.4f})")
 
-        # 5. Update Memory (Recursive SVD)
+        # 5. Update Memory
         if self.core_U.shape[1] == 0:
             self.core_U = U_new
         else:
@@ -228,8 +199,7 @@ class PiNoise(nn.Module):
             final_k = min(U_final.shape[1], MAX_ALLOWED_RANK)
             self.core_U = U_final[:, :final_k]
 
-        print(f"GPM Updated: Core Rank = {self.core_U.shape[1]}/{self.hidden_dim} (Max Cap: {MAX_ALLOWED_RANK})")
-
+        print(f"GPM Updated: Core Rank = {self.core_U.shape[1]}/{self.hidden_dim}")
 class Attention(nn.Module):
     fused_attn: Final[bool]
 
