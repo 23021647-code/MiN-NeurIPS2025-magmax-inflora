@@ -56,7 +56,7 @@ class MinNet(object):
         with torch.no_grad():
             for i, (_, inputs, targets) in enumerate(train_loader):
                 inputs = inputs.to(self.device)
-                with autocast(enabled=True):
+                with autocast('cuda', enabled=True):
                     feature = model.extract_feature(inputs)
                 features.append(feature.detach().cpu())
         
