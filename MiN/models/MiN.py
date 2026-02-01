@@ -10,7 +10,12 @@ import gc
 from utils.inc_net import MiNbaseNet
 from utils.toolkit import tensor2numpy, calculate_class_metrics, calculate_task_metrics
 from utils.training_tool import get_optimizer, get_scheduler
-from torch.amp import autocast, GradScaler
+
+# [FIX 1: Safe Import]
+try:
+    from torch.amp import autocast, GradScaler
+except ImportError:
+    from torch.cuda.amp import autocast, GradScaler
 
 class MinNet(object):
     def __init__(self, args, loger):
@@ -21,7 +26,6 @@ class MinNet(object):
         self.device = args['device']
         self.num_workers = args["num_workers"]
 
-        # Configs
         self.init_epochs = args["init_epochs"]
         self.init_lr = args["init_lr"]
         self.init_weight_decay = args["init_weight_decay"]
@@ -37,24 +41,22 @@ class MinNet(object):
 
         self.known_class = 0
         self.cur_task = -1
-        self.scaler = GradScaler('cuda')
-        
-        # Lưu trữ prototypes để tính Adaptive Scale
+        self.scaler = GradScaler()
         self.old_prototypes = [] 
+        self.total_acc = []
 
     def _clear_gpu(self):
         gc.collect()
         if torch.cuda.is_available(): torch.cuda.empty_cache()
 
     def get_task_prototype(self, model, train_loader):
-        """Tính vector đặc trưng trung bình của task"""
         model = model.eval()
         model.to(self.device)
         features = []
         with torch.no_grad():
             for i, (_, inputs, targets) in enumerate(train_loader):
                 inputs = inputs.to(self.device)
-                with autocast('cuda'):
+                with autocast(enabled=True):
                     feature = model.extract_feature(inputs)
                 features.append(feature.detach().cpu())
         
@@ -64,16 +66,12 @@ class MinNet(object):
         return prototype
 
     def compute_adaptive_scale(self, current_loader):
-        """
-        Tính Adaptive Scale dựa trên sự tương đồng Task.
-        """
         curr_proto = self.get_task_prototype(self._network, current_loader)
         
         if not self.old_prototypes:
             self.old_prototypes.append(curr_proto)
-            return 1.0 # Task 0 không dùng scale
+            return 1.0 
             
-        # Tính Cosine Similarity lớn nhất
         max_sim = 0.0
         curr_norm = F.normalize(curr_proto.unsqueeze(0), p=2, dim=1)
         for old_p in self.old_prototypes:
@@ -83,20 +81,24 @@ class MinNet(object):
                 
         self.old_prototypes.append(curr_proto)
         
-        # Mapping: Sim càng cao -> Scale càng thấp (cho phép overlap nhiều hơn)
         scale = 0.5 + 0.5 * (1.0 - max_sim)
-        scale = max(0.5, min(scale, 1.0)) # Giới hạn [0.5, 1.0]
+        scale = max(0.5, min(scale, 1.0))
         
-        self.logger.info(f"--> [ADAPTIVE SGP] Similarity: {max_sim:.4f} => Adaptive Scale: {scale:.4f}")
-        print(f"--> [ADAPTIVE SGP] Similarity: {max_sim:.4f} => Adaptive Scale: {scale:.4f}")
+        self.logger.info(f"--> [ADAPTIVE SGP] Similarity: {max_sim:.4f} => Scale: {scale:.4f}")
         return scale
 
     def init_train(self, data_manger):
         self.cur_task += 1
         train_list, test_list, _ = data_manger.get_task_list(0)
         train_set = data_manger.get_task_data(source="train", class_list=train_list)
-        train_loader = DataLoader(train_set, batch_size=self.init_batch_size, shuffle=True, num_workers=self.num_workers)
+        
+        # [FIX 2: IN-PLACE MAPPING] Khôi phục cách cũ để đảm bảo dataset nhận nhãn mới
+        train_set.labels = self.cat2order(train_set.labels, data_manger)
+        
         test_set = data_manger.get_task_data(source="test", class_list=test_list)
+        test_set.labels = self.cat2order(test_set.labels, data_manger)
+
+        train_loader = DataLoader(train_set, batch_size=self.init_batch_size, shuffle=True, num_workers=self.num_workers)
         self.test_loader = DataLoader(test_set, batch_size=self.init_batch_size, shuffle=False, num_workers=self.num_workers)
 
         if self.args['pretrained']:
@@ -107,12 +109,10 @@ class MinNet(object):
         
         self.run(train_loader)
         
-        # [PHƯƠNG ÁN CỦA BẠN]: Dùng Threshold 0.9 cho Task 0
-        # 0.9 sẽ lọc bỏ khoảng 40-50% số chiều (phần đuôi), giữ lại phần tinh hoa nhất.
+        # [CHIẾN THUẬT]: Threshold 0.9, không limit
         self._network.collect_projections(mode='threshold', val=0.9)
         self._clear_gpu()
         
-        # Fit Analytic Classifier & Lưu Prototype
         train_loader_buf = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True, num_workers=self.num_workers)
         self.fit_fc(train_loader_buf)
         self.compute_adaptive_scale(train_loader) 
@@ -121,8 +121,11 @@ class MinNet(object):
         self.cur_task += 1
         train_list, test_list, _ = data_manger.get_task_list(self.cur_task)
         train_set = data_manger.get_task_data(source="train", class_list=train_list)
-        train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True, num_workers=self.num_workers)
+        train_set.labels = self.cat2order(train_set.labels, data_manger)
         test_set = data_manger.get_task_data(source="test", class_list=test_list)
+        test_set.labels = self.cat2order(test_set.labels, data_manger)
+
+        train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True, num_workers=self.num_workers)
         self.test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False, num_workers=self.num_workers)
 
         if self.args['pretrained']:
@@ -137,16 +140,15 @@ class MinNet(object):
 
         self.run(train_loader_run)
         
-        # [PHƯƠNG ÁN CỦA BẠN]: Tiếp tục dùng 0.9 cho các Task sau
         self._network.collect_projections(mode='threshold', val=0.9)
         self._clear_gpu()
 
         train_set_no_aug = data_manger.get_task_data(source="train_no_aug", class_list=train_list)
+        train_set_no_aug.labels = self.cat2order(train_set_no_aug.labels, data_manger)
         train_loader_no_aug = DataLoader(train_set_no_aug, batch_size=self.buffer_batch, shuffle=True, num_workers=self.num_workers)
         self.re_fit(train_loader_no_aug)
 
     def run(self, train_loader):
-        scaler = GradScaler()
         epochs = self.init_epochs if self.cur_task == 0 else self.epochs
         lr = self.init_lr if self.cur_task == 0 else self.lr
         weight_decay = self.init_weight_decay if self.cur_task == 0 else self.weight_decay
@@ -161,7 +163,6 @@ class MinNet(object):
         optimizer = get_optimizer(self.args['optimizer_type'], params, lr, weight_decay)
         scheduler = get_scheduler(self.args['scheduler_type'], optimizer, epochs)
 
-        # [ADAPTIVE] Tính Scale
         current_scale = 0.85
         if self.cur_task > 0:
             current_scale = self.compute_adaptive_scale(train_loader)
@@ -178,7 +179,7 @@ class MinNet(object):
                 inputs, targets = inputs.to(self.device), targets.to(self.device)
                 optimizer.zero_grad(set_to_none=True) 
 
-                with autocast('cuda'):
+                with autocast(enabled=True): 
                     if self.cur_task > 0:
                         with torch.no_grad():
                             out1 = self._network(inputs, new_forward=False)['logits']
@@ -188,15 +189,14 @@ class MinNet(object):
                         logits = self._network.forward_normal_fc(inputs, new_forward=False)['logits']
                     loss = F.cross_entropy(logits, targets.long())
 
-                scaler.scale(loss).backward()
+                self.scaler.scale(loss).backward()
                 
-                # [SGP UPDATE] Chỉ áp dụng sau warm-up
                 if self.cur_task > 0 and epoch >= WARMUP_EPOCHS:
-                    scaler.unscale_(optimizer)
+                    self.scaler.unscale_(optimizer)
                     self._network.apply_gpm_to_grads(scale=current_scale)
                 
-                scaler.step(optimizer)
-                scaler.update()
+                self.scaler.step(optimizer)
+                self.scaler.update()
                 losses += loss.item()
                 _, preds = torch.max(logits, dim=1)
                 correct += preds.eq(targets.expand_as(preds)).cpu().sum()
@@ -204,7 +204,7 @@ class MinNet(object):
 
             scheduler.step()
             train_acc = 100. * correct / total
-            info = f"Task {self.cur_task} | Ep {epoch+1}/{epochs} | Loss {losses/len(train_loader):.3f} | Acc {train_acc:.2f} | Scale {current_scale:.2f}"
+            info = f"Task {self.cur_task} | Ep {epoch+1}/{epochs} | Loss {losses/len(train_loader):.3f} | Acc {train_acc:.2f}"
             prog_bar.set_description(info)
 
     def fit_fc(self, train_loader):
@@ -212,7 +212,7 @@ class MinNet(object):
         self._network.to(self.device)
         for _, inputs, targets in train_loader:
             inputs, targets = inputs.to(self.device), targets.to(self.device)
-            targets = F.one_hot(targets)
+            targets = F.one_hot(targets, num_classes=self._network.known_class)
             self._network.fit(inputs, targets)
         self._clear_gpu()
 
@@ -221,7 +221,7 @@ class MinNet(object):
         self._network.to(self.device)
         for _, inputs, targets in train_loader:
             inputs, targets = inputs.to(self.device), targets.to(self.device)
-            targets = F.one_hot(targets)
+            targets = F.one_hot(targets, num_classes=self._network.known_class)
             self._network.fit(inputs, targets)
         self._clear_gpu()
 
@@ -244,18 +244,7 @@ class MinNet(object):
         torch.save(self._network.state_dict(), path_name)
 
     def compute_test_acc(self, test_loader):
-        model = self._network.eval()
-        correct, total = 0, 0
-        device = self.device
-        with torch.no_grad(), autocast('cuda'):
-            for i, (_, inputs, targets) in enumerate(test_loader):
-                inputs = inputs.to(device)
-                outputs = model(inputs)
-                logits = outputs["logits"]
-                predicts = torch.max(logits, dim=1)[1]
-                correct += (predicts.cpu() == targets).sum()
-                total += len(targets)
-        return np.around(tensor2numpy(correct) * 100 / total, decimals=2)
+        return self.eval_task(test_loader)['all_class_accy']
 
     def eval_task(self, test_loader):
         model = self._network.eval()
@@ -281,6 +270,7 @@ class MinNet(object):
 
     @staticmethod
     def cat2order(targets, datamanger):
+        # [QUAN TRỌNG] Quay lại vòng lặp In-place để sửa đúng vào bộ nhớ của dataset
         for i in range(len(targets)):
             targets[i] = datamanger.map_cat2order(targets[i])
         return targets
