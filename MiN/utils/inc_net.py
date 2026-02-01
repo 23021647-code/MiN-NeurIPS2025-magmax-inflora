@@ -1,5 +1,3 @@
-import copy
-import logging
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -34,7 +32,7 @@ class MiNbaseNet(nn.Module):
 
         self.buffer = RandomBuffer(in_features=self.feature_dim, buffer_size=self.buffer_size, device=self.device)
 
-        # Analytic Learning Parameters
+        # RLS Params
         factory_kwargs = {"device": self.device, "dtype": torch.float32}
         weight = torch.zeros((self.buffer_size, 0), **factory_kwargs)
         self.register_buffer("weight", weight)
@@ -77,7 +75,7 @@ class MiNbaseNet(nn.Module):
     def init_unfreeze(self):
         for j in range(len(self.backbone.noise_maker)):
             self.backbone.noise_maker[j].unfreeze_task_0()
-            # Unfreeze LayerNorms if needed
+            # Giữ LayerNorm train được
             if hasattr(self.backbone.blocks[j], 'norm1'):
                 for p in self.backbone.blocks[j].norm1.parameters(): p.requires_grad = True
             if hasattr(self.backbone.blocks[j], 'norm2'):
@@ -91,6 +89,7 @@ class MiNbaseNet(nn.Module):
 
     @torch.no_grad()
     def fit(self, X: torch.Tensor, Y: torch.Tensor) -> None:
+        # Import an toàn
         try: from torch.amp import autocast
         except ImportError: from torch.cuda.amp import autocast
 
